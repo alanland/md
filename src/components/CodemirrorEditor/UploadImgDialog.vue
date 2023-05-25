@@ -492,7 +492,7 @@ export default {
           label: `自定义代码`,
         },
       ],
-      imgHost: `default`,
+      imgHost: `qiniu`,
     }
   },
   created() {

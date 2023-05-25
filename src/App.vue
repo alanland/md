@@ -4,6 +4,28 @@
   </div>
 </template>
 
+<script setup>
+const formQiniu1 = {
+  accessKey: process.env.QINIU_accessKey,
+  secretKey: process.env.QINIU_secretKey,
+  bucket: process.env.QINIU_bucket,
+  domain: process.env.QINIU_domain,
+  region: process.env.QINIU_region,
+}
+const formQiniu = {
+  accessKey: `M744EOz-2xH0iiZE6i5F7RgSHVmIkCmtnfrTXgRX`,
+  secretKey: `r_So9cankGdJdJKa9yUyyl8eMCxwWoqt7e5FnUK-`,
+  bucket: `weixin-mp-ai`,
+  domain: `http://rv5kfosh2.bkt.clouddn.com`,
+  region: `cn-east-2`,
+  path: `weixin-mp-ai/${new Date().toISOString().substring(0, 10)}`,
+}
+localStorage.setItem(`qiniuConfig`, JSON.stringify(formQiniu))
+console.log(formQiniu)
+localStorage.setItem(`imgHost`, `qiniu`)
+localStorage.setItem(`color`, `rgba(161, 27, 218, 1)`)
+</script>
+
 <style lang="less">
 // 仿 uniapp 外层全屏
 html,
@@ -66,6 +88,7 @@ body,
   &:first-of-type {
     margin-top: 0;
   }
+
   &:hover {
     background: #f0f0f0;
   }

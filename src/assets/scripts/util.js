@@ -214,7 +214,7 @@ export function formatCss(content) {
 export function downloadMD(doc) {
   const downLink = document.createElement(`a`)
 
-  downLink.download = `content.md`
+  downLink.download = `mp_` + new Date().toISOString().substring(0, 10) + `_` + doc.substring(0, doc.indexOf(`\n`)) || `content.md`
   downLink.style.display = `none`
   const blob = new Blob([doc])
 

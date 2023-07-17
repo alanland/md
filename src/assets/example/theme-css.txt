@@ -1,5 +1,6 @@
 /*
   按Ctrl+F可格式化
+  theme color:   rgba(161, 27, 218, 1)
 */
 /* 一级标题样式 */
 h1 {
@@ -15,9 +16,23 @@ h4 {
 }
 /* 图片样式 */
 image {
+   border: 0px solid;
+   border-image-source: linear-gradient(to right, #8f41e9, #6C59F5,#A466FF,#E86FFF,#FF84D5,#EAA093,#FFAD33);
+  border-image-slice: 1;
 }
 /* 引用样式 */
 blockquote {
+  border: 1px  solid rgb(201, 132, 255);
+  background: none !important;
+  border-radius: 0;
+}
+/* 引用样式 */
+blockquote {
+  border: 0px  solid rgb(201, 132, 255);
+  background: none !important;
+  border-radius: 0;
+  border-left: 1px  solid rgb(201, 132, 255) !important;
+  padding: 0px 8px 0px;
 }
 /* 引用段落样式 */
 blockquote_p {
@@ -51,4 +66,17 @@ li {
 }
 /* 代码块样式 */
 code {
+}
+
+ blockquote {
+  border-width: 1px;
+}
+h2 {
+  width:95%;
+  padding: 4px 45px;
+  padding: 4px 0px 0 5%;
+  text-align: left;
+  background: #a11bdabb;
+
+  background-image: linear-gradient(125deg,#7117eaff,#7117eadd,#ea6060dd,#d939cdee,#d939cdff);
 }

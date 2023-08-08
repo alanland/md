@@ -20,7 +20,7 @@ function portIsOk (port) {
 
 /**
  * 处理不同系统的命令行空格差异, 在 cp.spawn 中的参数中, 如果包含空格, win 平台需要使用双引号包裹, unix 不需要
- * @param {string} str
+ * @param {string} str 
  */
 function handleSpace(str = ``) {
   const newStr = require('os').type() === 'Windows_NT' ? `"${str}"` : str
@@ -83,8 +83,8 @@ function spawn (cmd, args, opts) {
 
 /**
  * 解析命令行参数
- * @param {*} arr
- * @returns
+ * @param {*} arr 
+ * @returns 
  */
 function parseArgv(arr) {
   return (arr || process.argv.slice(2)).reduce((acc, arg) => {
@@ -109,7 +109,7 @@ function dcloud(spaceInfo) {
   if(Boolean(spaceInfo.spaceId && spaceInfo.clientSecret) === false) {
     throw new Error(`请填写 spaceInfo`)
   }
-
+  
   function sign(data, secret) {
     const hmac = require(`crypto`).createHmac(`md5`, secret)
     // 排序 obj 再转换为 key=val&key=val 的格式
@@ -117,7 +117,7 @@ function dcloud(spaceInfo) {
     hmac.update(str)
     return hmac.digest(`hex`)
   }
-
+  
   async function anonymousAuthorize() {
     const data = {
       method: `serverless.auth.user.anonymousAuthorize`,
@@ -133,7 +133,7 @@ function dcloud(spaceInfo) {
       method: `POST`,
     }).then((res) => res.json())
   }
-
+  
   async function report({ id, token }) {
     const reportReq = {
       method: `serverless.file.resource.report`,
@@ -151,7 +151,7 @@ function dcloud(spaceInfo) {
       method: `POST`,
     }).then((res) => res.json())
   }
-
+  
   async function generateProximalSign({ name, token }) {
     const data = {
       method: `serverless.file.resource.generateProximalSign`,
@@ -170,8 +170,7 @@ function dcloud(spaceInfo) {
     }).then((res) => res.json())
     return res
   }
-
-  const protoco = `http`
+  
   async function upload({ data, file }) {
     const formdata = new FormData()
     Object.entries({
@@ -186,8 +185,8 @@ function dcloud(spaceInfo) {
       success_action_status: 200,
       file,
     }).forEach(([key, val]) => formdata.append(key, val))
-
-    return await fetch(`${protoco}://${data.host}`, {
+  
+    return await fetch(`https://${data.host}`, {
       headers: {
         'X-OSS-server-side-encrpytion': `AES256`,
       },
@@ -195,18 +194,18 @@ function dcloud(spaceInfo) {
       method: `POST`,
     })
   }
-
+  
   async function uploadFile({ name = `unnamed.file`, file }) {
     const token = (await anonymousAuthorize()).data.accessToken
     const res = await generateProximalSign({ name, token })
     await upload({ data: res.data, file })
     await report({ id: res.data.id, token })
-    const fileUrl = `${protoco}://${res.data.cdnDomain}/${res.data.ossPath}`
+    const fileUrl = `https://${res.data.cdnDomain}/${res.data.ossPath}`
     return fileUrl
   }
-
+  
   return uploadFile
-
+  
 }
 
 module.exports = {

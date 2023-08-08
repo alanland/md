@@ -1,10 +1,12 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <codemirror-editor />
   </div>
 </template>
 
 <script setup>
+import CodemirrorEditor from '@/views/CodemirrorEditor.vue'
+
 const formQiniu1 = {
   accessKey: process.env.QINIU_accessKey,
   secretKey: process.env.QINIU_secretKey,
@@ -88,7 +90,6 @@ body,
   &:first-of-type {
     margin-top: 0;
   }
-
   &:hover {
     background: #f0f0f0;
   }

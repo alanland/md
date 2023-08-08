@@ -19,11 +19,11 @@
           @export="exportEditorContent"
           @showCssEditor="showCssEditor = !showCssEditor"
           @show-about-dialog="aboutDialogVisible = true"
-          @show-dialog-form="insertFormDialogVisible = true"
+          @show-dialog-form="dialogFormVisible = true"
           @show-dialog-upload-img="dialogUploadImgVisible = true"
           @startCopy=";(isCoping = true), (backLight = true)"
           @endCopy="endCopy"
-        ></editor-header>
+        />
       </el-header>
       <el-main class="main-body">
         <el-row class="main-section">
@@ -31,7 +31,7 @@
             :span="12"
             class="codeMirror-wrapper"
             ref="codeMirrorWrapper"
-            @contextmenu.prevent.native="openMenu"
+            @contextmenu.prevent.native="openMenu($event)"
           >
             <textarea
               id="editor"
@@ -63,49 +63,51 @@
               </div>
             </section>
           </el-col>
-          <css-editor :show-css-editor="showCssEditor"></css-editor>
+          <transition
+            name="custom-classes-transition"
+            enter-active-class="bounceInRight"
+          >
+            <el-col
+              id="cssBox"
+              v-show="showCssEditor"
+              :span="12"
+              class="cssEditor-wrapper"
+            >
+              <textarea
+                id="cssEditor"
+                type="textarea"
+                placeholder="Your custom css here."
+              >
+              </textarea>
+            </el-col>
+          </transition>
         </el-row>
       </el-main>
     </el-container>
-
     <upload-img-dialog
-      :visible="dialogUploadImgVisible"
+      v-model="dialogUploadImgVisible"
       @close="dialogUploadImgVisible = false"
       @beforeUpload="beforeUpload"
       @uploadImage="uploadImage"
       @uploaded="uploaded"
-    ></upload-img-dialog>
-    <about-dialog
-      :visible="aboutDialogVisible"
-      @close="aboutDialogVisible = false"
-    ></about-dialog>
-    <insert-form-dialog
-      :visible="insertFormDialogVisible"
-      @close="insertFormDialogVisible = false"
-    ></insert-form-dialog>
-
+    />
+    <about-dialog v-model="aboutDialogVisible" />
+    <insert-form-dialog v-model="dialogFormVisible" />
     <right-click-menu
-      :visible="rightClickMenuVisible"
+      v-model="rightClickMenuVisible"
       :left="mouseLeft"
       :top="mouseTop"
       @menuTick="onMenuEvent"
-      @closeMenu="rightClickMenuVisible = false"
-    ></right-click-menu>
-    <run-loading></run-loading>
+      @closeMenu="closeRightClickMenu"
+    />
   </div>
 </template>
-
 <script>
-import { mapState, mapActions } from 'pinia'
-import { useStore } from '@/stores'
-
-import EditorHeader from '@/components/CodemirrorEditor/EditorHeader/index'
-import AboutDialog from '@/components/CodemirrorEditor/AboutDialog'
-import InsertFormDialog from '@/components/CodemirrorEditor/InsertFormDialog'
-import RightClickMenu from '@/components/CodemirrorEditor/RightClickMenu'
-import UploadImgDialog from '@/components/CodemirrorEditor/UploadImgDialog'
-import CssEditor from '@/components/CodemirrorEditor/CssEditor'
-import RunLoading from '@/components/RunLoading'
+import editorHeader from '../components/CodemirrorEditor/header'
+import aboutDialog from '../components/CodemirrorEditor/aboutDialog'
+import insertFormDialog from '../components/CodemirrorEditor/insertForm'
+import rightClickMenu from '../components/CodemirrorEditor/rightClickMenu'
+import uploadImgDialog from '../components/CodemirrorEditor/uploadImgDialog'
 
 import {
   css2json,
@@ -119,6 +121,7 @@ import {
   toBase64,
 } from '@/assets/scripts/util'
 import fileApi from '../api/file'
+import { mapState, mapMutations } from 'vuex'
 
 require(`codemirror/mode/javascript/javascript`)
 
@@ -128,7 +131,7 @@ export default {
       showCssEditor: false,
       aboutDialogVisible: false,
       dialogUploadImgVisible: false,
-      insertFormDialogVisible: false,
+      dialogFormVisible: false,
       isCoping: false,
       isImgLoading: false,
       backLight: false,
@@ -137,20 +140,17 @@ export default {
       source: ``,
       mouseLeft: 0,
       mouseTop: 0,
-      rightClickMenuVisible: false,
     }
   },
   components: {
-    CssEditor,
-    RunLoading,
-    EditorHeader,
-    AboutDialog,
-    InsertFormDialog,
-    RightClickMenu,
-    UploadImgDialog,
+    editorHeader,
+    aboutDialog,
+    insertFormDialog,
+    rightClickMenu,
+    uploadImgDialog,
   },
   computed: {
-    ...mapState(useStore, {
+    ...mapState({
       wxRenderer: (state) => state.wxRenderer,
       output: (state) => state.output,
       editor: (state) => state.editor,
@@ -158,6 +158,7 @@ export default {
       currentSize: (state) => state.currentSize,
       currentColor: (state) => state.currentColor,
       nightMode: (state) => state.nightMode,
+      rightClickMenuVisible: (state) => state.rightClickMenuVisible,
       codeTheme: (state) => state.codeTheme,
     }),
   },
@@ -298,14 +299,14 @@ export default {
       })
 
       this.editor.on(`mousedown`, () => {
-        this.rightClickMenuVisible = false
+        this.$store.commit(`setRightClickMenuVisible`, false)
       })
       this.editor.on(`blur`, () => {
         //!影响到右键菜单的点击事件，右键菜单的点击事件在组件内通过mousedown触发
-        this.rightClickMenuVisible = false
+        this.$store.commit(`setRightClickMenuVisible`, false)
       })
       this.editor.on(`scroll`, () => {
-        this.rightClickMenuVisible = false
+        this.$store.commit(`setRightClickMenuVisible`, false)
       })
     },
     initCssEditor() {
@@ -468,14 +469,12 @@ export default {
           start = anchor
           end = head
         }
+      } else if (head.line < anchor.line) {
+        start = head
+        end = anchor
       } else {
-        if (head.line < anchor.line) {
-          start = head
-          end = anchor
-        } else {
-          start = anchor
-          end = head
-        }
+        start = head
+        end = anchor
       }
 
       const rows = []
@@ -522,7 +521,6 @@ export default {
     exportEditorContent() {
       this.$nextTick(() => {
         exportHTML()
-        document.getElementById(`output`).innerHTML = this.output
       })
     },
     // 导入 Markdown 文档
@@ -572,9 +570,12 @@ export default {
       const left = e.clientX - offsetLeft
       this.mouseLeft = Math.min(maxLeft, left)
       this.mouseTop = e.clientY + 10
-      this.rightClickMenuVisible = true
+      this.$store.commit(`setRightClickMenuVisible`, true)
     },
-    onMenuEvent(type) {
+    closeRightClickMenu() {
+      this.$store.commit(`setRightClickMenuVisible`, false)
+    },
+    onMenuEvent(type, info = {}) {
       switch (type) {
         case `resetStyle`:
           this.$refs.header.showResetConfirm = true
@@ -589,7 +590,7 @@ export default {
           this.exportEditorContent()
           break
         case `insertTable`:
-          this.insertFormDialogVisible = true
+          this.dialogFormVisible = true
           break
         case `importMarkdown`:
           this.importMarkdownContent()
@@ -601,7 +602,7 @@ export default {
           break
       }
     },
-    ...mapActions(useStore, [
+    ...mapMutations([
       `initEditorState`,
       `initEditorEntity`,
       `setWxRendererOptions`,
@@ -691,15 +692,47 @@ export default {
   }
 }
 
+.bounceInRight {
+  animation-name: bounceInRight;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
 /deep/ .preview-table {
   border-spacing: 0;
+}
+
+@keyframes bounceInRight {
+  0%,
+  60%,
+  75%,
+  90%,
+  100% {
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  0% {
+    opacity: 0;
+    transform: translate3d(3000px, 0, 0);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(-25px, 0, 0);
+  }
+  75% {
+    transform: translate3d(10px, 0, 0);
+  }
+  90% {
+    transform: translate3d(-5px, 0, 0);
+  }
+  100% {
+    transform: none;
+  }
 }
 
 .codeMirror-wrapper {
   overflow-x: auto;
 }
 </style>
-
 <style lang="less" scoped>
 @import url('../assets/less/app.less');
 </style>

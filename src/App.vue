@@ -6,8 +6,7 @@
 
 <script setup>
 import CodemirrorEditor from '@/views/CodemirrorEditor.vue'
-
-localStorage.setItem(`color`, `rgba(161, 27, 218, 1)`)
+import * as ossconfig from './ossconfig'
 </script>
 
 <style lang="less">
@@ -72,6 +71,7 @@ body,
   &:first-of-type {
     margin-top: 0;
   }
+
   &:hover {
     background: #f0f0f0;
   }

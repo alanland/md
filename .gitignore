@@ -46,3 +46,5 @@ httpData
 public/upload/**
 !public/upload/*.gitkeep
 .history
+
+src/ossconfig.js

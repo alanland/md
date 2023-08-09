@@ -11,6 +11,7 @@
         <editor-header
           ref="header"
           @addFormat="addFormat"
+          @changeTheme="changeTheme"
           @formatContent="formatContent"
           @refresh="onEditorRefresh"
           @cssChanged="cssChanged"
@@ -171,6 +172,11 @@ export default {
     })
   },
   methods: {
+    changeTheme(theme) {
+      const style = localStorage.getItem(`__css_content_theme-${theme}`)
+      localStorage.setItem(`__css_content`, style)
+      window.changeTheme(style)
+    },
     // 转换 markdown 中的本地图片为线上图片
     // todo 处理事件覆盖
     mdLocalToRemote() {

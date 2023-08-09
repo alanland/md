@@ -1,0 +1,95 @@
+/*
+  theme-gradient-noborder.txt
+  按Ctrl+F可格式化
+  theme color:   rgba(161, 27, 218, 1)
+*/
+/* 一级标题样式 */
+h1 {
+}
+
+/* 二级标题样式 */
+h2 {
+}
+
+/* 三级标题样式 */
+h3 {
+}
+
+/* 四级标题样式 */
+h4 {
+}
+
+/* 图片样式 */
+image {
+  border: 0px solid;
+  border-image-source: linear-gradient(to right, #8f41e9, #6C59F5, #A466FF, #E86FFF, #FF84D5, #EAA093, #FFAD33);
+  border-image-slice: 1;
+}
+
+/* 引用样式 */
+blockquote {
+  background: none !important;
+  border: 0px solid rgb(201, 132, 255) !;
+  background: none !important;
+  border-radius: 0;
+  border-left: 1px solid rgb(201, 132, 255) !important;
+  padding: 0px 8px 0px 12px;
+}
+
+/* 引用段落样式 */
+blockquote_p {
+}
+
+/* 段落样式 */
+p {
+}
+
+/* 分割线样式 */
+hr {
+}
+
+/* 行内代码样式 */
+codespan {
+}
+
+/* 粗体样式 */
+strong {
+}
+
+/* 链接样式 */
+link {
+}
+
+/* 微信链接样式 */
+wx_link {
+}
+
+/* 有序列表样式 */
+ol {
+}
+
+/* 无序列表样式 */
+ul {
+}
+
+/* 列表项样式 */
+li {
+}
+
+/* 代码块样式 */
+code {
+}
+
+blockquote {
+  border-width: 1px;
+}
+
+h2 {
+  width: 95%;
+  padding: 4px 45px;
+  padding: 4px 0px 0 5%;
+  text-align: left;
+  background: #a11bdabb;
+
+  background-image: linear-gradient(125deg, #7117eaff, #7117eadd, #ea6060dd, #d939cdee, #d939cdff);
+}

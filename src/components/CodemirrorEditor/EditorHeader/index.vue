@@ -139,6 +139,34 @@
       </el-dropdown>
       <el-dropdown>
         <span class="el-dropdown-link">
+          主题<i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item @click.native="currentTheme = 'gradient-border';$emit('changeTheme','gradient-border')">
+            <i
+              class="el-icon-check"
+              :style="{ opacity: currentTheme === 'gradient-border' ? 1 : 0 }"
+            ></i>
+            渐变+边框
+          </el-dropdown-item>
+          <el-dropdown-item @click.native="currentTheme = 'gradient-noborder';$emit('changeTheme','gradient-noborder')">
+            <i
+              class="el-icon-check"
+              :style="{ opacity: currentTheme === 'gradient-noborder' ? 1 : 0 }"
+            ></i>
+            渐变+无边框
+          </el-dropdown-item>
+          <el-dropdown-item @click.native="currentTheme = 'imageheader';$emit('changeTheme','imageheader')">
+            <i
+              class="el-icon-check"
+              :style="{ opacity: currentTheme === 'imageheader' ? 1 : 0 }"
+            ></i>
+            图片背景
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+      <el-dropdown>
+        <span class="el-dropdown-link">
           帮助<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
@@ -193,6 +221,7 @@ export default {
       selectSize: ``,
       selectColor: ``,
       selectCodeTheme: config.codeThemeOption[2].value,
+      currentTheme: ``,
       form: {
         dialogVisible: false,
         title: ``,
@@ -386,6 +415,20 @@ export default {
         this.setCssEditorValue(DEFAULT_CSS_CONTENT)
       }
     },
+    async changeTheme(style) {
+      const re = /theme\scolor:\s+(.*)/
+      if (re.test(style)) {
+        const color = re.exec(style)[1]
+        this.colorChanged(color)
+        console.log(`color changed: ${color}`)
+      }
+      setTimeout(() => {
+        this.cssEditor.refresh()
+      }, 50)
+      if (style) {
+        this.setCssEditorValue(style)
+      }
+    },
     // 重置样式
     confirmReset() {
       this.showResetConfirm = false
@@ -442,6 +485,9 @@ export default {
         this.$emit(`import-md`, read.result)
       }
     }
+
+    this.customStyle()
+    window.changeTheme = this.changeTheme
   },
 }
 </script>
